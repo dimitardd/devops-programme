@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 LABEL maintainer="dhd.dimitrov@gmail.com"
-LABEL version="0.1"
+LABEL version="0.3"
 
 RUN apt-get update -y && \
 	apt-get install -y --no-install-recommends \
@@ -13,9 +13,10 @@ RUN apt-get update -y && \
 WORKDIR /app
 
 COPY --chown=appuser:appgroup requirements.txt .
-COPY --chown=appuser:appgroup ./app .
 
 RUN pip3 install -r requirements.txt
+
+COPY --chown=appuser:appgroup ./app .
 
 USER appuser
 
