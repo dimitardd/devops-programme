@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ansible==10.3.0
 ansible-compat==24.9.1
 ansible-core==2.17.5
@@ -15,3 +16,6 @@ werkzeug==3.0.0 ; python_version >= "3.10" and python_version < "4.0"
 =======
 flask==3.0.0
 >>>>>>> f87590b (dimitard - dockerfile and requarements Task01)
+=======
+flask==3.0.0
+>>>>>>> refs/remotes/origin/dimitard-231024
