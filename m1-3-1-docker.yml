@@ -1,0 +1,59 @@
+- name: Build, push and run Docker image M1-3-1 Ansible
+  hosts: localhost
+  gather_facts: no
+  
+  vars:
+    image_name: "dimitar-app02"
+    image_tag: "v4.19"
+    listen_port: "3000"
+    access_port: "5000"
+    dockerpath: "/opt/telerik/build"
+    dockerhubuser: "dimitardd"
+    gitbanch: "dimitardd-281024"
+  
+  vars_files:
+    - /opt/telerik/secrets/secret.yaml 
+  
+  
+  tasks:
+    - name: Get Dockerfile lates version!
+      git:
+        repo: git@github.com:dimitardd/devops-programme.git
+        dest: "{{ dockerpath }}"
+        version: "{{ gitbanch }}"
+        force: yes
+      register: git_status
+
+    - name: Build Container Image!
+      when: git_status.changed == true
+      docker_image:
+        name: "{{ image_name }}"
+        tag: "{{ image_tag }}"
+        build:
+          path: "{{ dockerpath }}"
+          dockerfile: Dockerfile
+        source: build
+        state: present
+
+    - name: Tag image with lates!
+      when: git_status.changed == true
+      command: docker image tag "{{ image_name }}:{{ image_tag }}" "{{ image_name }}:latest" "dimitardd/{{ image_name }}"
+      command: docker image tag "{{ image_name }}:{{ image_tag }}" "dimitardd/{{ image_name }}"
+    
+    - name: Log into DockerHub
+      community.docker.docker_login:
+        username: "{{ dockerhubuser }}"
+        password: "{{ dockerhub }}"
+
+    - name: Pus docker image to Docker HUB!
+      when: git_status.changed == true
+      command: docker image  push "dimitardd/{{ image_name }}"
+
+    - name: Run Docker container!
+      community.docker.docker_container:
+        name: "{{ image_name }}"
+        image: "{{ image_name }}:{{ image_tag }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "{{ access_port }}:{{ listen_port }}"
